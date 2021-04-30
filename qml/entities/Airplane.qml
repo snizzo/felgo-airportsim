@@ -24,6 +24,7 @@ EntityBase {
     property int minSpeed: 25
 
     property alias movement: movementHandler
+    property alias sprite: rect
 
     //placeholder for planes
     Rectangle {
@@ -84,11 +85,17 @@ EntityBase {
 
         }
         onPositionChanged:{
-            //console.debug("currentx: "+mouseX+", currenty: "+mouseY);
-            //console.debug("airplane position changed");
+            var vector = JsUtils.get2DVectorFromPoints([prevX,prevY],[mouseX,mouseY]);
+
+            var hypotenuse = Math.sqrt(Math.pow(vector[0],2)+Math.pow(vector[1],2));
+            // calculating hypotenuse makes us lose the sign info, so we have to multiply it again
+            hypotenuse *= vector[1]<0 ? -1:1
+            // radians to degrees
+            var degrees = Math.acos(vector[0]/hypotenuse) * (180/Math.PI);
+            // apply rotation
+            sprite.rotation = degrees
         }
         onReleased: {
-            console.debug("airplane released")
 
             //calculate current input velocity
             var vector = JsUtils.get2DVectorFromPoints([prevX,prevY],[mouseX,mouseY]);
