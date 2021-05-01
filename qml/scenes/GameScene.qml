@@ -1,33 +1,41 @@
 import Felgo 3.0
 import QtQuick 2.0
 import "../common"
+import "../entities"
+import "../levels/utils.js" as JsUtils
 
 SceneBase {
     id:gameScene
-    // the filename of the current level gets stored here, it is used for loading the
-    property string activeLevelFileName
-    // the currently loaded level gets stored here
-    property variant activeLevel
     // score
     property int score: 0
     // countdown shown at level start
-    property int countdown: 0
+    property int timeCounter: 1
     // flag indicating if game is running
-    property bool gameRunning: countdown == 0
+    property bool gameRunning: countdown != 0
 
-    // set the name of the current level, this will cause the Loader to load the corresponding level
-    function setLevel(fileName) {
-        activeLevelFileName = fileName
-    }
-
+    /*
     // background
     Rectangle {
         anchors.fill: parent.gameWindowAnchorItem
         color: "#dd94da"
+
+        Rectangle {
+            color: "white"
+            width: parent.width * 0.98
+            height: parent.height * 0.98
+            radius: 10
+            anchors.centerIn: parent
+        }
+    }
+    */
+
+    Airplane{
+
     }
 
     // back button to leave scene
     MenuButton {
+        id: gameSceneBackButton
         text: "Back to menu"
         // anchor the button to the gameWindowAnchorItem to be on the edge of the screen on any device
         anchors.right: gameScene.gameWindowAnchorItem.right
@@ -36,21 +44,33 @@ SceneBase {
         anchors.topMargin: 10
         onClicked: {
             backButtonPressed()
-            activeLevel = undefined
-            activeLevelFileName = ""
         }
     }
 
+    MenuButton {
+        text: "spawn airplane"
+        // anchor the button to the gameWindowAnchorItem to be on the edge of the screen on any device
+        anchors.right: gameScene.gameWindowAnchorItem.right
+        anchors.rightMargin: 10
+        anchors.top: gameSceneBackButton.bottom
+        anchors.topMargin: 10
+        onClicked: {
+            entityManager.spawnAirplane();
+        }
+    }
+
+    /*
     // name of the current level
     Text {
         anchors.left: gameScene.gameWindowAnchorItem.left
         anchors.leftMargin: 10
         anchors.top: gameScene.gameWindowAnchorItem.top
         anchors.topMargin: 10
-        color: "white"
+        color: "black"
         font.pixelSize: 20
         text: activeLevel !== undefined ? activeLevel.levelName : ""
     }
+    */
 
     // load levels at runtime
     Loader {
@@ -58,14 +78,15 @@ SceneBase {
         source: activeLevelFileName != "" ? "../levels/" + activeLevelFileName : ""
         onLoaded: {
             // reset the score
-            score = 0
+            timeCounter = 0
             // since we did not define a width and height in the level item itself, we are doing it here
             item.width = gameScene.width
             item.height = gameScene.height
             // store the loaded level as activeLevel for easier access
             activeLevel = item
-            // restarts the countdown
-            countdown = 3
+            // restarts the time counter
+            timeCounter = 0
+            timeCounter.running = true
         }
     }
 
@@ -74,14 +95,9 @@ SceneBase {
         // only connect if a level is loaded, to prevent errors
         target: activeLevel !== undefined ? activeLevel : null
         // increase the score when the rectangle is clicked
-        onRectanglePressed: {
-            // only increase score when game is running
-            if(gameRunning) {
-                score++
-            }
-        }
     }
 
+    /*
     // name of the current level
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -91,21 +107,38 @@ SceneBase {
         font.pixelSize: 40
         text: score
     }
+    */
 
-    // text displaying either the countdown or "tap!"
+    /*
+    // text displaying either the time counter or "tap!"
     Text {
         anchors.centerIn: parent
-        color: "white"
-        font.pixelSize: countdown > 0 ? 160 : 18
-        text: countdown > 0 ? countdown : "Let's go!"
+        color: "black"
+        font.pixelSize: timeCounter < 1 ? 160 : 18
+        text: timeCounter > 0 ? timeCounter: "Let's go!"
+    }
+    */
+
+    function reset(){
+        gameTimer.running = false;
+    }
+
+    function startGame(){
+        gameTimer.running = true;
     }
 
     // if the countdown is greater than 0, this timer is triggered every second, decreasing the countdown (until it hits 0 again)
     Timer {
+        id: gameTimer
         repeat: true
-        running: countdown > 0
+        running: false
         onTriggered: {
-            countdown--
+            timeCounter++
+            if (timeCounter % 1 == 0){
+
+                entityManager.spawnAirplane();
+
+            }
         }
     }
 }

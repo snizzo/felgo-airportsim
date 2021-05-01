@@ -6,7 +6,7 @@ SceneBase {
     id: menuScene
 
     // signal indicating that the selectLevelScene should be displayed
-    signal selectLevelPressed
+    signal playPressed
     // signal indicating that the creditsScene should be displayed
     signal creditsPressed
 
@@ -22,7 +22,7 @@ SceneBase {
         y: 30
         font.pixelSize: 30
         color: "#e9e9e9"
-        text: "MultiSceneMultiLevel"
+        text: "Airport Sim"
     }
 
     // menu
@@ -30,8 +30,8 @@ SceneBase {
         anchors.centerIn: parent
         spacing: 10
         MenuButton {
-            text: "Levels"
-            onClicked: selectLevelPressed()
+            text: "Play"
+            onClicked: playPressed()
         }
         MenuButton {
             text: "Credits"

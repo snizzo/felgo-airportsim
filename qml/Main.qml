@@ -1,6 +1,8 @@
 import Felgo 3.0
 import QtQuick 2.0
 import "scenes"
+import "levels/utils.js" as JsUtils
+import "entities"
 
 GameWindow {
     id: window
@@ -14,17 +16,33 @@ GameWindow {
     //  * Add plugins to monetize, analyze & improve your apps (available with the Pro Licenses)
     //licenseKey: "<generate one from https://felgo.com/licenseKey>"
 
+    PhysicsWorld {
+    // set no gravity, the collider is not physics-based
+    }
+
     // create and remove entities at runtime
     EntityManager {
         id: entityManager
+        entityContainer: gameScene
+
+        function spawnAirplane(){
+
+            var entityProperties = JsUtils.getRandomAirplaneProperties();
+
+            createEntityFromUrlWithProperties(Qt.resolvedUrl("entities/Airplane.qml"), entityProperties);
+
+            console.log("spawned");
+            console.log([entityProperties.x, entityProperties.y, entityProperties.velocity]);
+        }
     }
 
     // menu scene
     MenuScene {
         id: menuScene
         // listen to the button signals of the scene and change the state according to it
-        onSelectLevelPressed: window.state = "selectLevel"
+        onPlayPressed: window.state = "game"
         onCreditsPressed: window.state = "credits"
+
         // the menu scene is our start scene, so if back is pressed there we ask the user if he wants to quit the application
         onBackButtonPressed: {
             nativeUtils.displayMessageBox(qsTr("Really quit the game?"), "", 2);
@@ -40,18 +58,6 @@ GameWindow {
         }
     }
 
-    // scene for selecting levels
-    SelectLevelScene {
-        id: selectLevelScene
-        onLevelPressed: {
-            // selectedLevel is the parameter of the levelPressed signal
-            gameScene.setLevel(selectedLevel)
-            window.state = "game"
-
-        }
-        onBackButtonPressed: window.state = "menu"
-    }
-
     // credits scene
     CreditsScene {
         id: creditsScene
@@ -61,7 +67,8 @@ GameWindow {
     // game scene to play a level
     GameScene {
         id: gameScene
-        onBackButtonPressed: window.state = "selectLevel"
+        anchors.fill: parent
+        onBackButtonPressed: window.state = "menu"
     }
 
     // menuScene is our first scene, so set the state to menu initially
@@ -74,11 +81,6 @@ GameWindow {
             name: "menu"
             PropertyChanges {target: menuScene; opacity: 1}
             PropertyChanges {target: window; activeScene: menuScene}
-        },
-        State {
-            name: "selectLevel"
-            PropertyChanges {target: selectLevelScene; opacity: 1}
-            PropertyChanges {target: window; activeScene: selectLevelScene}
         },
         State {
             name: "credits"
