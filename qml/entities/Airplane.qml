@@ -9,8 +9,8 @@ EntityBase {
     entityId: "airplane"
     entityType: "airplaneEntity"
 
-    width: 40
-    height: 40
+    width: 30
+    height: 30
 
     // translate center of the sprite such that coordinate system
     // has (0,0) centered in the middle of EntityBase
@@ -41,7 +41,7 @@ EntityBase {
 
     CircleCollider {
         anchors.centerIn: parent
-        radius: 12.5
+        radius: 9.5
 
         fixture.onBeginContact: {
             var body = other.getBody();

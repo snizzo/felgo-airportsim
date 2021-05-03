@@ -8,8 +8,8 @@ function getRandomAirplaneProperties(){
 
     if(random < 0.33){
         newEntityProperties = {
-            x: JsUtils.getRandomNumberBetween(50,window.screenWidth-50), //50 pixels borders
-            y: window.screenHeight,
+            x: JsUtils.getRandomNumberBetween(50,window.currentWidth-50), //50 pixels borders
+            y: window.currentHeight,
             velocity: Qt.point(JsUtils.getRandomNumberBetween(-10,10),
                     JsUtils.getRandomNumberBetween(-10,-70))
             }
@@ -17,15 +17,15 @@ function getRandomAirplaneProperties(){
     if (random >= 0.33 && random < 0.66){
         newEntityProperties = {
             x: 20,
-            y: JsUtils.getRandomNumberBetween(200,window.screenHeight-50), //just a bit offscreen
+            y: JsUtils.getRandomNumberBetween(200,window.currentHeight-50), //just a bit offscreen
             velocity: Qt.point(JsUtils.getRandomNumberBetween(10,70),
                     JsUtils.getRandomNumberBetween(-10,10))
         }
     }
     if (random >= 0.66) {
         newEntityProperties = {
-            x: window.screenWidth-20,
-            y: JsUtils.getRandomNumberBetween(200,window.screenHeight-50), //just a bit offscreen
+            x: window.currentWidth-20,
+            y: JsUtils.getRandomNumberBetween(200,window.currentHeight-50), //just a bit offscreen
             velocity: Qt.point(JsUtils.getRandomNumberBetween(-10,-70),
                     JsUtils.getRandomNumberBetween(-10,10))
         }

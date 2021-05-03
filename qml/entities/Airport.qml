@@ -8,8 +8,8 @@ EntityBase {
     entityId: "airport"
     entityType: "airportEntity"
 
-    width: 100
-    height: 50
+    width: 50
+    height: 25
 
     property alias sprite: rect
 

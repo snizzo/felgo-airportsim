@@ -6,8 +6,14 @@ import "entities"
 
 GameWindow {
     id: window
+
+    // just desktop window size
     screenWidth: 960
     screenHeight: 640
+
+    // virtual resolution, necessary for different screen scaling
+    property int currentWidth: 480
+    property int currentHeight: 320
 
     signal airplaneDestroyed(string entityId)
 
@@ -103,14 +109,12 @@ GameWindow {
     // game scene to play a level
     GameScene {
         id: gameScene
-        anchors.fill: parent
         onBackButtonPressed: window.state = "menu"
     }
 
     // game scene to play a level
     GameLostScene {
         id: gameLostScene
-        anchors.fill: parent
         onBackButtonPressed: window.state = "menu"
     }
 

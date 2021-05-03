@@ -20,21 +20,7 @@ SceneBase {
     //if opacity > 0 game scene is considered active
     property bool isActive: opacity > 0
 
-    /*
-    // background
-    Rectangle {
-        anchors.fill: parent.gameWindowAnchorItem
-        color: "#dd94da"
-
-        Rectangle {
-            color: "white"
-            width: parent.width * 0.98
-            height: parent.height * 0.98
-            radius: 10
-            anchors.centerIn: parent
-        }
-    }
-    */
+    //stuff...
 
     Airport{
         id: airport
@@ -80,7 +66,7 @@ SceneBase {
         anchors.top: parent.top
         anchors.right: parent.right
         color: "white"
-        font.pixelSize: 40
+        font.pixelSize: 20
         text: score
     }
 
