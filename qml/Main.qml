@@ -9,6 +9,8 @@ GameWindow {
     screenWidth: 960
     screenHeight: 640
 
+    signal airplaneDestroyed(string entityId)
+
     // You get free licenseKeys from https://felgo.com/licenseKey
     // With a licenseKey you can:
     //  * Publish your games & apps for the app stores
@@ -25,15 +27,49 @@ GameWindow {
         id: entityManager
         entityContainer: gameScene
 
+        property int idCounter: 0
+
         function spawnAirplane(){
 
             var entityProperties = JsUtils.getRandomAirplaneProperties();
+            entityProperties["entityId"] = "airplane"+idCounter;
+
+            idCounter++;
 
             createEntityFromUrlWithProperties(Qt.resolvedUrl("entities/Airplane.qml"), entityProperties);
-
-            console.log("spawned");
-            console.log([entityProperties.x, entityProperties.y, entityProperties.velocity]);
         }
+
+        function destroyAirplane(id){
+            removeEntityById(id);
+        }
+
+        //removing all airplane entities
+        function destroyAllAirplanes(){
+            removeEntitiesByFilter(["airplaneEntity"])
+        }
+    }
+
+    Connections {
+        target: gameScene
+        onDestroyAirplane : {
+            console.log("destroying airplane")
+        // compare the monsters entityId with the on that is passed from the signal
+            entityManager.destroyAirplane(entityId);
+        }
+
+        onSpawnAirplane : {
+            entityManager.spawnAirplane();
+        }
+
+        onDestroyAllAirplanes : {
+            entityManager.destroyAllAirplanes();
+        }
+
+        onGameLost : {
+            gameLostScene.finalScore = finalScore
+            state = "gamelost"
+        }
+
     }
 
     // menu scene
@@ -71,6 +107,13 @@ GameWindow {
         onBackButtonPressed: window.state = "menu"
     }
 
+    // game scene to play a level
+    GameLostScene {
+        id: gameLostScene
+        anchors.fill: parent
+        onBackButtonPressed: window.state = "menu"
+    }
+
     // menuScene is our first scene, so set the state to menu initially
     state: "menu"
     activeScene: menuScene
@@ -81,6 +124,11 @@ GameWindow {
             name: "menu"
             PropertyChanges {target: menuScene; opacity: 1}
             PropertyChanges {target: window; activeScene: menuScene}
+        },
+        State {
+            name: "gamelost"
+            PropertyChanges {target: gameLostScene; opacity: 1}
+            PropertyChanges {target: window; activeScene: gameLostScene}
         },
         State {
             name: "credits"

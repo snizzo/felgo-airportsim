@@ -9,8 +9,8 @@ EntityBase {
     entityId: "airplane"
     entityType: "airplaneEntity"
 
-    width: 20
-    height: 20
+    width: 40
+    height: 40
 
     // translate center of the sprite such that coordinate system
     // has (0,0) centered in the middle of EntityBase
@@ -19,7 +19,7 @@ EntityBase {
     transform: Translate { x: -10
                             y: -10 }
 
-    property int maxSpeed: 50
+    property int maxSpeed: 100
     property int currentSpeed: 10
     property int minSpeed: 25
 
@@ -28,23 +28,30 @@ EntityBase {
     property alias sprite: rect
 
     //placeholder for planes
-    Rectangle {
+    Image {
         id: rect
 
         anchors.fill: parent
 
-        color: "red"
+        source: "../../assets/img/airplane.png"
     }
 
     // used for collisions between planes
-    BoxCollider {
-        anchors.fill: rect
+
+
+    CircleCollider {
+        anchors.centerIn: parent
+        radius: 12.5
 
         fixture.onBeginContact: {
-            //console.log("collision between planes...")
-            // when colliding with another entity, play the sound and start particleEffect
-            //collisionSound.play();
-            //collisionParticleEffect.start();
+            var body = other.getBody();
+            var collidedEntity = body.target;
+            var collidedEntityType = collidedEntity.entityType;
+            var collidedEntityId = collidedEntity.entityId;
+
+            if(collidedEntityType==="airplaneEntity"){
+                gameScene.airplanesCollided()
+            }
         }
     }
 
@@ -63,6 +70,11 @@ EntityBase {
         running: true
     }
 
+    onVelocityChanged: {
+        var vector = JsUtils.get2DVectorFromPoints([0,0],[velocity.x,velocity.y]);
+        rotate(vector);
+    }
+
     function applyVelocity(vector){
         //and get new velocity based on current one
         var newvel = JsUtils.getNormalizedVelocityFromVector(vector, movement.velocity, maxSpeed, minSpeed);
@@ -74,21 +86,25 @@ EntityBase {
             movement.velocity = newvel;
         }
 
-        if(vector[0] !== 0 && vector[1] !== 0){
-            rotate(vector);
-        }
-
-
+        rotate(vector);
     }
 
     //rotate airplane from given a rotation vector
     function rotate(vector){
+        if(vector[0] === 0 && vector[1] === 0){
+            return;
+        }
 
         var hypotenuse = Math.sqrt(Math.pow(vector[0],2)+Math.pow(vector[1],2));
         // calculating hypotenuse makes us lose the sign info, so we have to multiply it again
         hypotenuse *= vector[1]<0 ? -1:1
         // radians to degrees
         var degrees = Math.acos(vector[0]/hypotenuse) * (180/Math.PI);
+        if(hypotenuse<0){
+            degrees += 180;
+        }
+
+        degrees += 90
 
         // apply rotation
         sprite.rotation = degrees
@@ -136,7 +152,6 @@ EntityBase {
 
             //calculate current input velocity
             var vector = JsUtils.get2DVectorFromPoints([prevX,prevY],[mouseX,mouseY]);
-            console.log("applying vel")
 
             applyVelocity(vector);
 

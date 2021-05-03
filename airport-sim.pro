@@ -60,4 +60,6 @@ macx {
 }
 
 DISTFILES += \
-    qml/entities/Airplane.qml
+    qml/entities/Airplane.qml \
+    qml/entities/Airport.qml \
+    qml/scenes/GameLostScene.qml

@@ -6,12 +6,19 @@ import "../levels/utils.js" as JsUtils
 
 SceneBase {
     id:gameScene
+
+    signal spawnAirplane()
+    signal destroyAirplane(string entityId)
+    signal destroyAllAirplanes()
+    signal airplanesCollided()
+    signal gameLost(int finalScore)
+
     // score
     property int score: 0
     // countdown shown at level start
-    property int timeCounter: 1
-    // flag indicating if game is running
-    property bool gameRunning: countdown != 0
+    property int timeCounter: 0
+    //if opacity > 0 game scene is considered active
+    property bool isActive: opacity > 0
 
     /*
     // background
@@ -29,8 +36,18 @@ SceneBase {
     }
     */
 
-    Airplane{
+    Airport{
+        id: airport
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
 
+    Connections{
+        target: airport
+        onAirplaneLanded : {
+            score++;
+            destroyAirplane(entityId);
+        }
     }
 
     // back button to leave scene
@@ -40,8 +57,8 @@ SceneBase {
         // anchor the button to the gameWindowAnchorItem to be on the edge of the screen on any device
         anchors.right: gameScene.gameWindowAnchorItem.right
         anchors.rightMargin: 10
-        anchors.top: gameScene.gameWindowAnchorItem.top
-        anchors.topMargin: 10
+        anchors.bottom: gameScene.gameWindowAnchorItem.bottom
+        anchors.bottomMargin: 10
         onClicked: {
             backButtonPressed()
         }
@@ -52,79 +69,45 @@ SceneBase {
         // anchor the button to the gameWindowAnchorItem to be on the edge of the screen on any device
         anchors.right: gameScene.gameWindowAnchorItem.right
         anchors.rightMargin: 10
-        anchors.top: gameSceneBackButton.bottom
-        anchors.topMargin: 10
+        anchors.bottom: gameSceneBackButton.top
+        anchors.bottomMargin: 10
         onClicked: {
-            entityManager.spawnAirplane();
+            spawnAirplane();
         }
     }
 
-    /*
-    // name of the current level
     Text {
-        anchors.left: gameScene.gameWindowAnchorItem.left
-        anchors.leftMargin: 10
-        anchors.top: gameScene.gameWindowAnchorItem.top
-        anchors.topMargin: 10
-        color: "black"
-        font.pixelSize: 20
-        text: activeLevel !== undefined ? activeLevel.levelName : ""
-    }
-    */
-
-    // load levels at runtime
-    Loader {
-        id: loader
-        source: activeLevelFileName != "" ? "../levels/" + activeLevelFileName : ""
-        onLoaded: {
-            // reset the score
-            timeCounter = 0
-            // since we did not define a width and height in the level item itself, we are doing it here
-            item.width = gameScene.width
-            item.height = gameScene.height
-            // store the loaded level as activeLevel for easier access
-            activeLevel = item
-            // restarts the time counter
-            timeCounter = 0
-            timeCounter.running = true
-        }
-    }
-
-    // we connect the gameScene to the loaded level
-    Connections {
-        // only connect if a level is loaded, to prevent errors
-        target: activeLevel !== undefined ? activeLevel : null
-        // increase the score when the rectangle is clicked
-    }
-
-    /*
-    // name of the current level
-    Text {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: gameScene.gameWindowAnchorItem.top
-        anchors.topMargin: 30
+        anchors.top: parent.top
+        anchors.right: parent.right
         color: "white"
         font.pixelSize: 40
         text: score
     }
-    */
 
-    /*
-    // text displaying either the time counter or "tap!"
-    Text {
-        anchors.centerIn: parent
-        color: "black"
-        font.pixelSize: timeCounter < 1 ? 160 : 18
-        text: timeCounter > 0 ? timeCounter: "Let's go!"
+    // binding isActive with stop and start functions
+    onIsActiveChanged: {
+        isActive ? start() : stop()
     }
-    */
 
-    function reset(){
+    onAirplanesCollided: {
+        if(gameTimer.running){
+            gameLost(score);
+        }
+        stop();
+    }
+
+    function stop(){
         gameTimer.running = false;
+        score = 0;
+
+        //sending signal of level closing
+        destroyAllAirplanes();
     }
 
-    function startGame(){
+    function start(){
         gameTimer.running = true;
+        timeCounter = 0;
+        score = 0;
     }
 
     // if the countdown is greater than 0, this timer is triggered every second, decreasing the countdown (until it hits 0 again)
@@ -133,11 +116,19 @@ SceneBase {
         repeat: true
         running: false
         onTriggered: {
+            // every 7 seconds spawn a new airplane
             timeCounter++
-            if (timeCounter % 1 == 0){
 
-                entityManager.spawnAirplane();
+            // every 5 planes becomes -100ms (10% faster)
+            // with a minimum of 100ms (1000% original speed)
+            // because seconds last one tenth of original time
+            if(interval>200){
+                interval -= 20; // 20ms
+            }
 
+            if (timeCounter % 7 == 0){
+                // signal
+                spawnAirplane();
             }
         }
     }
