@@ -7,8 +7,7 @@ Rectangle {
     height: buttonText.height+ paddingVertical*2
 
     color: "#e9e9e9"
-    // round edges
-    radius: 10
+
 
     // the horizontal margin from the Text element to the Rectangle at both the left and the right side.
     property int paddingHorizontal: 10

@@ -8,22 +8,24 @@ SceneBase {
     // background
     Rectangle {
         anchors.fill: parent.gameWindowAnchorItem
-        color: "#49a349"
+        color: "#64ccff"
     }
 
     // back button to leave scene
     MenuButton {
         text: "Back"
+
         // anchor the button to the gameWindowAnchorItem to be on the edge of the screen on any device
-        anchors.right: creditsScene.gameWindowAnchorItem.right
-        anchors.rightMargin: 10
-        anchors.top: creditsScene.gameWindowAnchorItem.top
+        anchors.top: creditsText.bottom
         anchors.topMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+
         onClicked: backButtonPressed()
     }
 
     // credits
     Text {
+        id: creditsText
         text: "Credits to: YOU :)"
         color: "white"
         anchors.centerIn: parent

@@ -13,27 +13,34 @@ SceneBase {
     // background
     Rectangle {
         anchors.fill: parent.gameWindowAnchorItem
-        color: "#47688e"
+        color: "#64ccff"
     }
 
-    // the "logo"
-    Text {
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: 30
-        font.pixelSize: 30
-        color: "#e9e9e9"
-        text: "Airport Sim"
+    FontLoader {
+        id: webFont;
+        source: "../../assets/fonts/PoiretOne-Regular.ttf"
     }
 
     // menu
     Column {
         anchors.centerIn: parent
         spacing: 10
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.pixelSize: 40
+            font.family: webFont.name
+            color: "#e9e9e9"
+            text: "Airport Simulator"
+        }
         MenuButton {
+            anchors.horizontalCenter: parent.horizontalCenter
+
             text: "Play"
             onClicked: playPressed()
         }
         MenuButton {
+            anchors.horizontalCenter: parent.horizontalCenter
+
             text: "Credits"
             onClicked: creditsPressed()
         }

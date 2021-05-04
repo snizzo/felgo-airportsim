@@ -20,7 +20,11 @@ SceneBase {
     //if opacity > 0 game scene is considered active
     property bool isActive: opacity > 0
 
-    //stuff...
+    // background
+    Rectangle {
+        anchors.fill: parent.gameWindowAnchorItem
+        color: "#64ccff"
+    }
 
     Airport{
         id: airport
@@ -47,18 +51,6 @@ SceneBase {
         anchors.bottomMargin: 10
         onClicked: {
             backButtonPressed()
-        }
-    }
-
-    MenuButton {
-        text: "spawn airplane"
-        // anchor the button to the gameWindowAnchorItem to be on the edge of the screen on any device
-        anchors.right: gameScene.gameWindowAnchorItem.right
-        anchors.rightMargin: 10
-        anchors.bottom: gameSceneBackButton.top
-        anchors.bottomMargin: 10
-        onClicked: {
-            spawnAirplane();
         }
     }
 
